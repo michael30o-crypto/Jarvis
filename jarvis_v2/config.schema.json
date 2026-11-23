@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:jarvis:config:v1",
+  "title": "Jarvis 2.0 local runtime configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "privacy",
+    "runtime",
+    "backends",
+    "scheduler",
+    "models",
+    "speech",
+    "memory",
+    "permissions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_only",
+        "bind_host",
+        "allow_remote_inference",
+        "allow_model_downloads"
+      ],
+      "properties": {
+        "local_only": {
+          "const": true
+        },
+        "bind_host": {
+          "enum": [
+            "127.0.0.1",
+            "::1"
+          ]
+        },
+        "allow_remote_inference": {
+          "const": false
+        },
+        "allow_model_downloads": {
+          "const": false
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data_dir",
+        "log_level"
+      ],
+      "properties": {
+        "data_dir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "log_level": {
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR"
+          ]
+        }
+      }
+    },
+    "backends": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ollama",
+        "llama_cpp",
+        "qwen3_tts"
+      ],
+      "properties": {
+        "ollama": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "base_url"
+          ],
+          "properties": {
+            "base_url": {
+              "type": "string",
+              "pattern": "^http://127\\.0\\.0\\.1:[0-9]{1,5}/?$"
+            }
+          }
+        },
+        "llama_cpp": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "base_url",
+            "model_dir",
+            "server_executable"
+          ],
+          "properties": {
+            "base_url": {
+              "type": "string",
+              "pattern": "^http://127\\.0\\.0\\.1:[0-9]{1,5}/?$"
+            },
+            "model_dir": {
+              "type": "string",
+              "minLength": 1
+            },
+            "server_executable": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "qwen3_tts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "base_url"
+          ],
+          "properties": {
+            "base_url": {
+              "type": "string",
+              "pattern": "^http://127\\.0\\.0\\.1:[0-9]{1,5}/?$"
+            }
+          }
+        }
+      }
+    },
+    "scheduler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vram_reserve_mib",
+        "max_resident_gpu_models",
+        "allow_cpu_fallback",
+        "selection_policy"
+      ],
+      "properties": {
+        "vram_reserve_mib": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 4096,
+          "default": 1024
+        },
+        "max_resident_gpu_models": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "default": 1
+        },
+        "allow_cpu_fallback": {
+          "type": "boolean",
+          "default": false
+        },
+        "selection_policy": {
+          "enum": [
+            "estimated_fit",
+            "exclusive"
+          ],
+          "default": "estimated_fit"
+        }
+      }
+    },
+    "models": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/model"
+      }
+    },
+    "speech": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "asr_provider",
+        "tts_model_id",
+        "allow_system_tts"
+      ],
+      "properties": {
+        "asr_provider": {
+          "enum": [
+            "openwhispr",
+            "local_backend"
+          ]
+        },
+        "tts_model_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "allow_system_tts": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sqlite_path",
+        "semantic_search_enabled",
+        "embedding_model_id"
+      ],
+      "properties": {
+        "sqlite_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "semantic_search_enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "embedding_model_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_app_ids",
+        "allowed_url_schemes",
+        "confirm_actions",
+        "deny_shell"
+      ],
+      "properties": {
+        "allowed_app_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]+$"
+          }
+        },
+        "allowed_url_schemes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "http",
+              "https"
+            ]
+          }
+        },
+        "confirm_actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "launch_app",
+              "open_url",
+              "write_file",
+              "delete_file",
+              "system_setting"
+            ]
+          }
+        },
+        "deny_shell": {
+          "const": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "backend",
+        "local_ref",
+        "roles",
+        "enabled",
+        "estimated_vram_mib",
+        "estimated_ram_mib",
+        "context_tokens"
+      ],
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_.-]+$"
+        },
+        "backend": {
+          "enum": [
+            "ollama",
+            "llama_cpp",
+            "qwen3_tts"
+          ]
+        },
+        "local_ref": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?![a-zA-Z][a-zA-Z0-9+.-]*://).+$"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "chat",
+              "asr",
+              "tts",
+              "embedding",
+              "vision",
+              "rerank"
+            ]
+          }
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "estimated_vram_mib": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimated_ram_mib": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "context_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

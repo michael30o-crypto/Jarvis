@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "privacy": {
+    "local_only": true,
+    "bind_host": "127.0.0.1",
+    "allow_remote_inference": false,
+    "allow_model_downloads": false
+  },
+  "runtime": {
+    "data_dir": "%LOCALAPPDATA%/Jarvis/data",
+    "log_level": "INFO"
+  },
+  "backends": {
+    "ollama": {
+      "base_url": "http://127.0.0.1:11434"
+    },
+    "llama_cpp": {
+      "base_url": "http://127.0.0.1:8080",
+      "model_dir": "%LOCALAPPDATA%/Jarvis/models",
+      "server_executable": null
+    },
+    "qwen3_tts": {
+      "base_url": "http://127.0.0.1:8090"
+    }
+  },
+  "scheduler": {
+    "vram_reserve_mib": 1024,
+    "max_resident_gpu_models": 1,
+    "allow_cpu_fallback": false,
+    "selection_policy": "estimated_fit"
+  },
+  "models": [
+    {
+      "model_id": "chat",
+      "backend": "ollama",
+      "local_ref": "qwen3:8b",
+      "roles": [
+        "chat"
+      ],
+      "enabled": true,
+      "estimated_vram_mib": 5632,
+      "estimated_ram_mib": 0,
+      "context_tokens": 4096
+    },
+    {
+      "model_id": "voice",
+      "backend": "qwen3_tts",
+      "local_ref": "qwen3-tts-12hz-1.7b-base",
+      "roles": [
+        "tts"
+      ],
+      "enabled": true,
+      "estimated_vram_mib": 6144,
+      "estimated_ram_mib": 0,
+      "context_tokens": null
+    }
+  ],
+  "speech": {
+    "asr_provider": "openwhispr",
+    "tts_model_id": "voice",
+    "allow_system_tts": true
+  },
+  "memory": {
+    "sqlite_path": "%LOCALAPPDATA%/Jarvis/data/jarvis.sqlite3",
+    "semantic_search_enabled": false,
+    "embedding_model_id": null
+  },
+  "permissions": {
+    "allowed_app_ids": [
+      "calculator",
+      "notepad",
+      "explorer",
+      "comfyui",
+      "qwen",
+      "applio",
+      "openwhispr"
+    ],
+    "allowed_url_schemes": [
+      "https",
+      "http"
+    ],
+    "confirm_actions": [
+      "launch_app",
+      "open_url",
+      "write_file",
+      "delete_file",
+      "system_setting"
+    ],
+    "deny_shell": true
+  }
+}
